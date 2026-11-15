@@ -6,8 +6,8 @@ actuators_router = APIRouter(prefix="/actuators", tags=["Actuators"])
 api_v1_router = APIRouter(prefix="/api/v1", tags=["API v1"])
 
 
-#Actuator routes
+# Actuator routes
 actuators_router.include_router(health_router)
 
 
-#API v1 routes
+# API v1 routes
