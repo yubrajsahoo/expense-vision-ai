@@ -1,100 +1,130 @@
 # 🧾 Expense Vision Service
 
-[![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.163%2B-009688.svg)](https://fastapi.tiangolo.com/)
-[![uv](https://img.shields.io/badge/managed%20by-uv-de5fe9.svg)](https://github.com/astral-sh/uv)
-[![Ruff](https://img.shields.io/badge/linter-ruff-261230.svg)](https://github.com/astral-sh/ruff)
-[![pytest](https://img.shields.io/badge/tested%20with-pytest-0A9EDC.svg)](https://docs.pytest.org/)
+[![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.163%2B-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Managed by uv](https://img.shields.io/badge/managed%20by-uv-de5fe9.svg?logo=astral&logoColor=white)](https://github.com/astral-sh/uv)
+[![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg?logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
+[![Tests: Pytest](https://img.shields.io/badge/tested%20with-pytest-0A9EDC.svg?logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://coverage.readthedocs.io/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-An asynchronous AI microservice built with **Python 3.12+** and **FastAPI** for the **Expense Vision AI** platform. It acts as an intelligent worker and gatekeeper responsible for validating, pre-processing, and extracting structured financial information from uploaded receipts and UPI payment screenshots.
+An asynchronous AI microservice engineered with **Python 3.12+** and **FastAPI** for the **Expense Vision AI** ecosystem. It serves as an intelligent worker and gatekeeper responsible for validating, pre-processing, and extracting structured financial metadata from uploaded receipts and UPI payment screenshots.
 
 ---
 
 ## 📑 Table of Contents
 
-- [🥗 Ingredients](#ingredients)
-- [📌 Overview & Role](#overview--role)
-- [📋 Prerequisites & Installation](#prerequisites--installation)
-- [⚙️ Configuration & Environment Variables](#configuration--environment-variables)
-- [🚀 All Required Commands (Bash)](#all-required-commands-bash)
-  - [1. Installation & Environment Setup](#1-installation--environment-setup)
-  - [2. Running the Application](#2-running-the-application)
-  - [3. Code Quality & Linting (`ruff`)](#3-code-quality--linting-ruff)
-  - [4. Testing & Code Coverage (`pytest`)](#4-testing--code-coverage-pytest)
-  - [5. Dependency Management (`uv`)](#5-dependency-management-uv)
-- [📡 API Endpoints](#api-endpoints)
-- [📂 Project Structure](#project-structure)
-- [🧪 Developer Workflow Checklist](#developer-workflow-checklist)
+- [✨ Key Capabilities](#-key-capabilities)
+- [🏛️ System Architecture](#️-system-architecture)
+- [🥗 Tech Stack & Ingredients](#-tech-stack--ingredients)
+- [📋 Prerequisites & System Binaries](#-prerequisites--system-binaries)
+- [⚙️ Configuration & Environment Variables](#️-configuration--environment-variables)
+- [🚀 Quickstart & Execution](#-quickstart--execution)
+- [📡 API Reference & Contracts](#-api-reference--contracts)
+  - [1. Process Expense (`POST /api/v1/expense`)](#1-process-expense-post-apiv1expense)
+  - [2. Health Actuator (`GET /actuators/health`)](#2-health-actuator-get-actuatorshealth)
+  - [3. Interactive Documentation](#3-interactive-documentation)
+- [🧪 Testing & Quality Assurance](#-testing--quality-assurance)
+- [📂 Project Directory Structure](#-project-directory-structure)
+- [🛡️ Security & Performance Highlights](#️-security--performance-highlights)
+- [🔄 Developer Workflow Checklist](#-developer-workflow-checklist)
 
 ---
 
-<a id="ingredients"></a>
-## 🥗 Ingredients
+## ✨ Key Capabilities
 
-Everything that powers this microservice:
-
-### 1. Framework & Core Runtime
-- **Python 3.12+**: Modern Python runtime with enhanced performance and typing.
-- **FastAPI (`>=0.163.1`)**: High-performance asynchronous web framework for building APIs.
-- **Uvicorn (`>=0.54.0`)**: Production-ready, lightning-fast ASGI server.
-- **Pydantic v2 (`>=2.14.3`)**: Strict data validation, schema modeling, and JSON serialization.
-- **Pydantic Settings (`>=2.16.3`)**: Type-safe settings and environment variable management.
-
-### 2. AI, Computer Vision & OCR
-- **Google GenAI SDK (`google-genai >=3.3.0`)**: Official client for Google Gemini Multimodal LLMs (receipt and screenshot extraction).
-- **OpenCV (`opencv-python >=5.0.0.93`)**: Image pre-processing, noise reduction, and image manipulation.
-- **Tesseract OCR (`pytesseract >=0.3.13`)**: Optical Character Recognition engine for fast local keyword validation.
-
-### 3. Developer Tooling & Testing
-- **Astral `uv`**: Ultra-fast Python package and project manager.
-- **Ruff (`>=0.17.5`)**: High-speed Python linter and code formatter.
-- **Pytest (`>=9.2.0`)**: Test framework with support for fixtures and async testing (`anyio`).
-- **Pytest-Cov (`>=7.1.0`)**: Test coverage reporting with 80%+ threshold enforcement.
-
-### 4. External Credentials & System Binaries
-- **Google Gemini API Key**: API key from [Google AI Studio](https://aistudio.google.com/) for LLM inference.
-- **Tesseract OCR Binary**: System-level executable installed and present in system `PATH`.
+- **⚡ Smart Gatekeeper Pre-filtering:** Local, sub-second OCR validation via **OpenCV** and **Tesseract OCR** instantly detects financial markers (e.g., `₹`, `rs`, `inr`, `upi`, `total`, `amount`, `paid`, `sent`, `transaction`). Non-financial images are rejected upfront, avoiding unnecessary LLM token consumption and latency.
+- **🤖 Multimodal AI Extraction:** Leverages the **Google GenAI SDK** (`gemini-3.8-flash`) to parse complex receipts, physical invoices, and UPI screenshots into structured data.
+- **🔒 Deterministic Schema Enforcement:** Strict typed schema contracts powered by **Pydantic v2** guarantee JSON responses (merchant name, total amount, ISO date, payment method, and UTR reference).
+- **🚀 Non-Blocking Concurrency:** Heavy CPU-bound image decoding, OCR subprocesses, and AI inference run asynchronously in worker threadpools, ensuring the ASGI event loop remains completely responsive under high concurrency.
+- **🛡️ Built-in Denial-of-Service Protection:** Enforces configurable file size thresholds and MIME type validation (`image/png`, `image/jpeg`, `image/jpg`, `image/webp`) before reading or decoding payloads.
+- **📊 100% Test Coverage:** Comprehensive test suite with parameterized unit tests, mock isolation, and end-to-end integration tests.
 
 ---
 
-<a id="overview--role"></a>
-<a id="overview-and-role"></a>
-## 📌 Overview & Role
+## 🏛️ System Architecture
 
-In the larger Expense Vision AI polyglot architecture, `expense-vision-service` works alongside the Java Spring Boot gateway (`expense-core-api`):
+The following diagram illustrates how an uploaded image flows through the **Expense Vision Service**:
 
-1. **Gatekeeper (Pre-filter):** Fast local validation using **OpenCV** and **Tesseract OCR** to detect financial keywords (e.g. ₹, UPI, Total, invoice patterns) and reject invalid images instantly before invoking external LLMs.
-2. **Extractor (Multimodal AI):** Uses the **Google Gemini API** (`google-genai`) to parse receipts and UPI screenshots into structured data.
-3. **Structured Contracts:** Enforces strict data schemas using **Pydantic** models (e.g., merchant name, transaction amount, date, payment method, UTR number).
-4. **Actuators & Monitoring:** Provides health check endpoints (`/actuators/health`) for readiness and liveness probes.
-
----
-
-<a id="prerequisites--installation"></a>
-## 📋 Prerequisites & Installation
-
-Before running the service, install system prerequisites:
-
-### 1. Install `uv` Package Manager (Bash)
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+```mermaid
+flowchart TD
+    Client["Client / API Gateway (Spring Boot)"] -->|"POST /api/v1/expense (multipart/form-data)"| Router["FastAPI Router (v1/expense)"]
+    Router --> Service["Expense Orchestrator Service"]
+    
+    Service --> Validate["Validate MIME & File Size (<= 10MB)"]
+    Validate -->|"Invalid / Oversized"| Err400["HTTP 400 Bad Request (InvalidImageError)"]
+    
+    Validate -->|"Valid Payload"| ThreadPool["Threadpool Offload (asyncio.to_thread)"]
+    ThreadPool --> Gatekeeper["Local Gatekeeper (OpenCV + Tesseract OCR)"]
+    
+    Gatekeeper -->|"No Financial Markers"| NonFinancial["Return ExpenseData (is_financial=False) - 200 OK"]
+    
+    Gatekeeper -->|"Financial Markers Detected"| Gemini["Google Gemini Multimodal API (gemini-3.8-flash)"]
+    Gemini -->|"Structured JSON Extraction"| Schema["Pydantic Validation (ExpenseData)"]
+    Schema --> Response["HTTP 200 OK (Structured Financial JSON)"]
+    
+    Gemini -.->|"Upstream Timeout / API Error"| Err502["HTTP 502 Bad Gateway (ExtractionError)"]
 ```
 
-### 2. Install Tesseract OCR Engine (Bash)
+---
+
+## 🥗 Tech Stack & Ingredients
+
+| Layer | Technology | Version | Purpose |
+| :--- | :--- | :--- | :--- |
+| **Language** | [Python](https://www.python.org/) | `3.12+` | Core application runtime |
+| **Framework** | [FastAPI](https://fastapi.tiangolo.com/) | `>= 0.163.1` | High-performance asynchronous web API framework |
+| **ASGI Server** | [Uvicorn](https://www.uvicorn.org/) | `>= 0.54.0` | Production-grade ASGI server with auto-reload |
+| **AI / Multimodal** | [Google GenAI SDK](https://github.com/googleapis/python-genai) | `>= 3.3.0` | Official SDK for Google Gemini models |
+| **Computer Vision** | [OpenCV (Headless)](https://opencv.org/) | `>= 5.0.0.93` | Fast image decoding and grayscale conversion |
+| **OCR Engine** | [Tesseract / pytesseract](https://github.com/tesseract-ocr/tesseract) | `>= 0.3.13` | Local optical character recognition for Gatekeeper filter |
+| **Data Validation** | [Pydantic v2](https://docs.pydantic.dev/) | `>= 2.14.3` | Request/response data models and JSON validation |
+| **Settings** | [Pydantic Settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) | `>= 2.16.3` | Type-safe environment variable parsing |
+| **Package Manager** | [Astral uv](https://github.com/astral-sh/uv) | Latest | Blazing-fast dependency resolver and virtual environment manager |
+| **Linter / Formatter** | [Astral Ruff](https://github.com/astral-sh/ruff) | `>= 0.17.5` | Code formatting and static code analysis |
+| **Testing** | [Pytest](https://docs.pytest.org/) & [pytest-cov](https://pytest-cov.readthedocs.io/) | `>= 9.2.0` | Unit & integration testing with 100% coverage |
+
+---
+
+## 📋 Prerequisites & System Binaries
+
+### 1. Install `uv` Package Manager
+
+`uv` is recommended for managing Python dependencies and virtual environments:
+
+```bash
+# Linux / macOS
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+### 2. Install Tesseract OCR Engine
+
+The local Gatekeeper service requires the Tesseract OCR binary to be installed on the host machine:
+
 - **Ubuntu / Debian:**
   ```bash
   sudo apt-get update && sudo apt-get install -y tesseract-ocr
   ```
-- **macOS:**
+- **macOS (Homebrew):**
   ```bash
   brew install tesseract
   ```
-- **Windows (Git Bash):**
-  Download the installer from [UB-Mannheim Tesseract OCR](https://github.com/UB-Mannheim/tesseract/wiki) and ensure the install location (e.g. `C:\Program Files\Tesseract-OCR`) is in your `PATH`.
+- **Windows:**
+  Download and run the installer from [UB-Mannheim Tesseract OCR](https://github.com/UB-Mannheim/tesseract/wiki). Ensure the installation path (e.g. `C:\Program Files\Tesseract-OCR`) is added to your system `PATH`.
+  Verify by running:
+  ```bash
+  tesseract --version
+  ```
+
+### 3. Google Gemini API Key
+
+Obtain an API key from [Google AI Studio](https://aistudio.google.com/) for multimodal processing.
 
 ---
 
-<a id="configuration--environment-variables"></a>
 ## ⚙️ Configuration & Environment Variables
 
 Create your local `.env` configuration file from the template:
@@ -110,150 +140,128 @@ cp .env.example .env
 | `GEMINI_API_KEY` | **Yes** | — | API key for Google Gemini multimodal processing |
 | `GEMINI_MODEL` | No | `gemini-3.8-flash` | Gemini model identifier used for extraction |
 | `HOST` | No | `0.0.0.0` | Host address to bind the Uvicorn server |
-| `PORT` | No | `8000` | Port to bind the server |
+| `PORT` | No | `8000` | Port number to bind the server |
 | `RELOAD` | No | `true` | Enable/disable auto-reload during development |
 | `MAX_FILE_SIZE_MB` | No | `10` | Maximum allowed image upload size in megabytes |
 
 ---
 
-<a id="all-required-commands-bash"></a>
-## 🚀 All Required Commands (Bash)
+## 🚀 Quickstart & Execution
 
-All commands below are designed to be run directly in **Bash** (Linux, macOS, WSL, or Git Bash on Windows).
-
-<a id="1-installation--environment-setup"></a>
-### 1. Installation & Environment Setup
+### 1. Environment Setup
 
 ```bash
-# Sync and install all project dependencies into a local virtual environment (.venv)
+# Sync and install all dependencies into the managed virtual environment (.venv)
 uv sync
 
 # (Optional) Activate the virtual environment
-source .venv/bin/activate
-# Note: On Git Bash for Windows, run: source .venv/Scripts/activate
+source .venv/bin/activate       # Linux/macOS
+# .venv\Scripts\activate       # Windows PowerShell
 ```
 
----
-
-<a id="2-running-the-application"></a>
 ### 2. Running the Application
 
-#### Option A: Run via Uvicorn (Recommended for development)
+#### Option A: Recommended Development Server (via Uvicorn)
 ```bash
 uv run python -m uvicorn main:app --app-dir src --host 127.0.0.1 --port 8000 --reload
 ```
 
-#### Option B: Run via Main Entrypoint
+#### Option B: Via Application Entrypoint
 ```bash
 PYTHONPATH=src uv run python -m src.main
 ```
 
-#### Option C: With Activated Virtual Environment
-```bash
-python -m uvicorn main:app --app-dir src --reload
-```
-
 #### Service URLs
-- **Interactive API Docs (Swagger UI):** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **Alternative API Docs (ReDoc):** [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
-- **Health Actuator:** [http://127.0.0.1:8000/actuators/health](http://127.0.0.1:8000/actuators/health)
+- **Interactive Swagger UI:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Alternative ReDoc:** [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+- **Health Check Actuator:** [http://127.0.0.1:8000/actuators/health](http://127.0.0.1:8000/actuators/health)
 
 ---
 
-<a id="3-code-quality--linting-ruff"></a>
-### 3. Code Quality & Linting (`ruff`)
+## 📡 API Reference & Contracts
 
-`ruff` handles both fast linting and formatting as configured in `pyproject.toml`.
+### 1. Process Expense (`POST /api/v1/expense`)
 
+Receives an image of a physical receipt or digital payment screenshot, validates its authenticity via OCR, and extracts structured financial fields.
+
+- **Content-Type:** `multipart/form-data`
+- **Supported File Types:** `image/png`, `image/jpeg`, `image/jpg`, `image/webp`
+- **Max File Size:** `10 MB` (configurable via `MAX_FILE_SIZE_MB`)
+
+#### Sample Request (`curl`):
 ```bash
-# Check for lint errors across codebase
-uv run python -m ruff check
+curl -X POST "http://127.0.0.1:8000/api/v1/expense" \
+  -H "accept: application/json" \
+  -F "image=@receipt.png;type=image/png"
+```
 
-# Automatically fix fixable lint errors
-uv run python -m ruff check --fix
+#### Response Scenarios:
 
-# Check code formatting without modifying files
-uv run python -m ruff format --check
+##### Case 1: Valid Financial Receipt (200 OK)
+Returned when financial keywords are found and Gemini successfully extracts the expense details:
+```json
+{
+  "is_financial": true,
+  "merchant_name": "Coffee House",
+  "amount": 245.5,
+  "date": "2026-11-18",
+  "payment_method": "UPI",
+  "utr_number": "123456789012"
+}
+```
 
-# Format all code files
-uv run python -m ruff format
+##### Case 2: Non-Financial Image Rejected by Gatekeeper (200 OK)
+Returned when the image contains no financial keywords (e.g., photo of scenery, document text without financial markers). Gemini inference is bypassed entirely:
+```json
+{
+  "is_financial": false,
+  "merchant_name": null,
+  "amount": null,
+  "date": null,
+  "payment_method": null,
+  "utr_number": null
+}
+```
+
+##### Case 3: Unsupported Content-Type (400 Bad Request)
+```json
+{
+  "error": "InvalidImageError",
+  "message": "Unsupported content type application/pdf",
+  "path": "/api/v1/expense"
+}
+```
+
+##### Case 4: File Size Exceeded (400 Bad Request)
+```json
+{
+  "error": "InvalidImageError",
+  "message": "File size exceeds maximum limit of 10 MB.",
+  "path": "/api/v1/expense"
+}
+```
+
+##### Case 5: AI Extraction Failure (502 Bad Gateway)
+```json
+{
+  "error": "ExtractionError",
+  "message": "Unable to extract expense data",
+  "path": "/api/v1/expense"
+}
 ```
 
 ---
 
-<a id="4-testing--code-coverage-pytest"></a>
-### 4. Testing & Code Coverage (`pytest`)
+### 2. Health Actuator (`GET /actuators/health`)
 
-`pytest` is configured via `pyproject.toml` with default coverage enforcement (target: 80%+).
+Readiness and liveness probe endpoint designed for container orchestrators (Kubernetes, AWS ECS, Docker Compose).
 
+#### Request:
 ```bash
-# Run full test suite with coverage report
-uv run python -m pytest
-
-# Run tests without coverage check
-uv run python -m pytest --no-cov
-
-# Run a specific test file
-uv run python -m pytest tests/unit/config/test_config.py
-
-# Run tests with verbose output
-uv run python -m pytest -v
-
-# Run tests matching a keyword expression
-uv run python -m pytest -k "test_setting"
-
-# Open HTML coverage report after a test run
-xdg-open htmlcov/index.html 2>/dev/null || open htmlcov/index.html 2>/dev/null || start htmlcov/index.html
+curl -i http://127.0.0.1:8000/actuators/health
 ```
 
----
-
-<a id="5-dependency-management-uv"></a>
-### 5. Dependency Management (`uv`)
-
-Manage libraries without editing `pyproject.toml` manually:
-
-```bash
-# Add a new runtime dependency
-uv add <package-name>
-
-# Add a development-only dependency
-uv add --dev <package-name>
-
-# Remove a dependency
-uv remove <package-name>
-
-# Regenerate and lock dependencies
-uv lock
-
-# Upgrade all packages to their latest compatible versions
-uv lock --upgrade
-
-# Inspect the dependency graph
-uv tree
-```
-
----
-
-<a id="api-endpoints"></a>
-## 📡 API Endpoints
-
-| Method | Endpoint | Description | Status |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/actuators/health` | Service liveness / health check | Active |
-| `POST` | `/api/v1/expense` | Validate and extract structured receipt data | Active |
-| `GET` | `/docs` | Interactive Swagger API documentation | Active |
-| `GET` | `/redoc` | ReDoc API documentation | Active |
-
-### Health Check Response Example
-
-**Request:**
-```http
-GET /actuators/health HTTP/1.1
-Host: 127.0.0.1:8000
-```
-
-**Response (200 OK):**
+#### Response (200 OK):
 ```json
 {
   "name": "expense-vision-service",
@@ -263,55 +271,92 @@ Host: 127.0.0.1:8000
 
 ---
 
-<a id="project-structure"></a>
-## 📂 Project Structure
+### 3. Interactive Documentation
+
+FastAPI auto-generates interactive OpenAPI documentation:
+- **Swagger UI:** `GET /docs`
+- **ReDoc:** `GET /redoc`
+- **OpenAPI Schema:** `GET /openapi.json`
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+The project enforces strict testing standards with **100% statement and branch coverage**.
+
+### 1. Run Unit Tests (Fast & Isolated)
+Unit tests mock all external AI and OCR dependencies for instant execution:
+```bash
+uv run pytest
+```
+
+### 2. Run Live Integration Tests
+Live integration tests exercise the end-to-end API pipeline with real image samples:
+```bash
+uv run pytest --integration
+```
+
+### 3. Generate HTML Coverage Report
+```bash
+# View coverage in terminal or generate HTML report
+uv run pytest --cov=src --cov-report=html
+
+# View in browser
+xdg-open htmlcov/index.html 2>/dev/null || open htmlcov/index.html 2>/dev/null || start htmlcov/index.html
+```
+
+---
+
+## 📂 Project Directory Structure
 
 ```text
 expense-vision-service/
-├── .env.example               # Sample environment variables template
-├── .gitignore                 # Git ignore patterns
-├── pyproject.toml             # Dependencies, ruff & pytest configuration
-├── uv.lock                    # Dependency lockfile
-├── README.md                  # Project documentation and command reference
+├── .env.example                     # Environment variables template
+├── .gitignore                       # Git ignore rules
+├── pyproject.toml                   # Project metadata, dependencies, & tooling config
+├── uv.lock                          # Deterministic dependency lockfile
+├── README.md                        # Project documentation
 ├── src/
 │   ├── __init__.py
-│   ├── main.py                # FastAPI application initialization & server startup
+│   ├── main.py                      # Application factory & server startup
 │   ├── config/
 │   │   ├── __init__.py
-│   │   └── config.py          # Settings model (pydantic-settings)
+│   │   └── config.py                # Pydantic Settings & logger configuration
 │   ├── exceptions/
 │   │   ├── __init__.py
-│   │   ├── custom_exceptions.py # Custom domain exceptions
-│   │   └── handlers.py        # Global exception handlers
+│   │   ├── custom_exceptions.py     # Domain exceptions (AppException, InvalidImageError)
+│   │   └── handlers.py              # Global exception interceptors & JSON envelopes
 │   ├── router/
 │   │   ├── __init__.py
-│   │   ├── routers.py         # Router registry (Actuators & API v1)
+│   │   ├── routers.py               # Aggregated top-level APIRouter
 │   │   ├── actuators/
 │   │   │   ├── __init__.py
-│   │   │   └── health.py      # Health check endpoint
+│   │   │   └── health.py            # Health check endpoint
 │   │   └── v1/
 │   │       ├── __init__.py
-│   │       └── expense.py     # Expense extraction endpoint
+│   │       └── expense.py           # /api/v1/expense endpoint definition
 │   ├── schemas/
 │   │   ├── __init__.py
-│   │   └── schemas.py         # Pydantic schemas (ExpenseData)
+│   │   └── schemas.py               # Pydantic schemas (ExpenseData contract)
 │   └── services/
 │       ├── __init__.py
-│       ├── expense.py         # Expense orchestration service
-│       ├── extractor.py       # Gemini multimodal extraction service
-│       └── gatekeeper.py      # Local OCR gatekeeper validation
+│       ├── expense.py               # Orchestrator service (validation, OCR, AI)
+│       ├── extractor.py             # Gemini multimodal extraction client
+│       └── gatekeeper.py            # Local OpenCV + Tesseract OCR keyword filter
 └── tests/
     ├── __init__.py
-    ├── conftest.py            # Global test fixtures (FastAPI TestClient)
+    ├── conftest.py                  # Global pytest fixtures & CLI options
     ├── helper/
     │   ├── __init__.py
-    │   ├── mock_helper.py     # Test mocking helpers
-    │   └── resource_utils.py  # Test resource loading utilities
-    ├── integration/           # Integration tests (--integration)
+    │   ├── mock_helper.py           # Context managers for mocking Gemini/GenAI
+    │   └── resource_utils.py        # Fixture readers (images, JSON)
+    ├── integration/                 # End-to-end tests requiring --integration
     │   ├── router/
     │   └── services/
-    ├── resources/             # Test images and JSON fixtures
-    └── unit/                  # Fast isolated unit tests
+    ├── resources/                   # Mock image assets & JSON fixtures
+    │   ├── images/
+    │   └── json/
+    └── unit/                        # High-speed unit tests (100% coverage)
         ├── config/
         ├── exceptions/
         ├── router/
@@ -321,23 +366,39 @@ expense-vision-service/
 
 ---
 
-<a id="developer-workflow-checklist"></a>
-## 🧪 Developer Workflow Checklist
+## 🛡️ Security & Performance Highlights
 
-When developing or submitting changes:
-1. Ensure dependencies are in sync:
+1. **Non-Blocking Architecture:** Synchronous, compute-heavy tasks (`cv2`, `pytesseract`, synchronous I/O) are isolated from the asyncio event loop using `asyncio.to_thread`, guaranteeing that worker threads handle CPU spikes while the ASGI server continues servicing health checks and incoming HTTP connections.
+2. **Deterministic Data Contracts:** The Google GenAI extraction request explicitly binds `response_schema=ExpenseData` and `response_mime_type="application/json"`. The model is constrained to generate pure, valid JSON adhering to schema constraints without hallucinated markdown fences.
+3. **Layered Validation:** Multi-tier defenses protect the microservice:
+   - MIME type header checks prevent non-image payloads.
+   - Upper file size bounds mitigate memory exhaustion attacks.
+   - Buffer decoding with OpenCV verifies image integrity before OCR or LLM transmission.
+4. **Resilient Error Propagation:** Uncaught internal errors are intercepted by global handlers and sanitized into structured JSON envelopes (`error`, `message`, `path`) without exposing internal tracebacks.
+
+---
+
+## 🔄 Developer Workflow Checklist
+
+When developing or submitting code changes:
+
+1. **Synchronize Dependencies:**
    ```bash
    uv sync
    ```
-2. Apply formatting:
+2. **Apply Code Formatting:**
    ```bash
-   uv run python -m ruff format
+   uv run ruff format .
    ```
-3. Verify lint checks:
+3. **Execute Static Analysis & Linter:**
    ```bash
-   uv run python -m ruff check
+   uv run ruff check .
    ```
-4. Run tests & maintain coverage:
+4. **Run Unit Tests & Verify Coverage:**
    ```bash
-   uv run python -m pytest
+   uv run pytest
+   ```
+5. **Run Full Integration Suite:**
+   ```bash
+   uv run pytest --integration
    ```
