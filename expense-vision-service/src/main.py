@@ -7,7 +7,8 @@ the server lifecycle with Uvicorn.
 import uvicorn
 from fastapi import FastAPI
 
-from config.config import settings
+from config.config import configure_logging, settings
+from exceptions.handlers import register_exception_handlers
 from router.routers import actuators_router, api_v1_router
 
 
@@ -19,11 +20,13 @@ def create_app() -> FastAPI:
 
     :return: Configured FastAPI application instance.
     """
+    configure_logging()
     application = FastAPI(
         title="Expense Vision Service",
         description="AI worker for processing receipts and UPI screenshots",
         version="0.1.0",
     )
+    register_exception_handlers(application)
     application.include_router(actuators_router)
     application.include_router(api_v1_router)
 
