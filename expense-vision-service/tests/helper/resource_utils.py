@@ -1,5 +1,7 @@
+import json
 import logging
 from pathlib import Path
+from typing import Any
 
 _logger = logging.getLogger(__name__)
 
@@ -31,6 +33,11 @@ def read_as_bytes(relative_path: str) -> bytes:
         if alt_path.is_file():
             file_path = alt_path
 
-    _logger.info(f"Reading image file: {file_path}")
+    _logger.info("Reading resource file: %s", file_path)
     with open(file_path, "rb") as file:
         return file.read()
+
+
+def read_as_json(relative_path: str) -> Any:
+    """Read and decode a JSON fixture relative to ``tests/resources``."""
+    return json.loads(read_as_bytes(relative_path))

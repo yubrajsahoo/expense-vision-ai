@@ -1,11 +1,11 @@
 import runpy
-from unittest.mock import patch
 
 from fastapi import FastAPI
 
 import main
 from config.config import settings
 from main import create_app
+from tests.helper import mock_helper
 
 
 def test_create_app():
@@ -20,9 +20,10 @@ def test_create_app():
     )
     assert application.version == "0.1.0"
 
-    # Verify registered openapi routes include actuator endpoints
+    # Verify registered openapi routes include actuator and api v1 endpoints
     openapi_schema = application.openapi()
     assert "/actuators/health" in openapi_schema["paths"]
+    assert "/api/v1/expense" in openapi_schema["paths"]
 
     # Verify documentation routes
     doc_paths = [route.path for route in application.routes if hasattr(route, "path")]
@@ -38,7 +39,7 @@ def test_app_instance():
 
 def test_main_execution():
     """Verify that running as a script invokes uvicorn.run with expected settings."""
-    with patch("uvicorn.run") as mock_run:
+    with mock_helper.mock_method("uvicorn.run") as mock_run:
         runpy.run_module("main", run_name="__main__")
         mock_run.assert_called_once_with(
             "src.main:app",

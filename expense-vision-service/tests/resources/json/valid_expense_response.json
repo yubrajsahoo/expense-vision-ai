@@ -1,0 +1,8 @@
+{
+  "is_financial": true,
+  "merchant_name": "Coffee House",
+  "amount": 245.5,
+  "date": "2026-11-18",
+  "payment_method": "UPI",
+  "utr_number": "123456789012"
+}

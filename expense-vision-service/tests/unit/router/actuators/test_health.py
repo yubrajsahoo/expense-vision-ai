@@ -1,6 +1,16 @@
 import pytest
 
-from router.actuators.health import health_check
+from router.actuators.health import health_check, health_router
+
+
+def test_health_router_configuration():
+    """Test that health_router is configured with GET /health."""
+    routes = [r for r in health_router.routes if hasattr(r, "path")]
+    assert len(routes) == 1
+    route = routes[0]
+    assert route.path == "/health"
+    assert "GET" in route.methods
+    assert route.description == "Actuator to check health"
 
 
 @pytest.mark.anyio
