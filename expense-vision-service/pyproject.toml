@@ -52,3 +52,10 @@ testpaths = [
 ]
 # Ensure the src directory is in the Python path
 pythonpath = ["src"]
+
+# Enable live console logging
+log_cli = true
+log_cli_level = "INFO"
+# Optional: Make the log output cleaner and easier to read
+log_cli_format = "%(asctime)s [%(levelname)s] %(filename)s:%(funcName)s() - %(message)s"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
