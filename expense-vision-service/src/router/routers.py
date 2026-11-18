@@ -1,3 +1,5 @@
+"""Top-level router configuration and aggregation for actuators and API v1 endpoints."""
+
 from fastapi import APIRouter
 
 from router.actuators.health import health_router

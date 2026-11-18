@@ -3,5 +3,8 @@
   <component name="Black">
     <option name="sdkName" value="uv (expense-vision-service)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="uv (expense-vision-service)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="E:\GitWork\expense-vision-ai\expense-vision-service\.venv" project-jdk-type="Python SDK" />
+  <component name="TestRunnerService">
+    <option name="PROJECT_TEST_RUNNER" value="pytest" />
+  </component>
 </project>
