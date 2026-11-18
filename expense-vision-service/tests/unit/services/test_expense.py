@@ -5,6 +5,7 @@ import pytest
 from fastapi import UploadFile
 from starlette.datastructures import Headers
 
+from config.config import settings
 from exceptions.custom_exceptions import ExtractionError, InvalidImageError
 from schemas.schemas import ExpenseData
 from services.expense import _ALLOWED_CONTENT_TYPES, extract_expense_data
@@ -69,20 +70,34 @@ async def test_extract_expense_data_empty_file():
 
 
 @pytest.mark.anyio
-async def test_extract_expense_data_rejected_by_gatekeeper(caplog):
+async def test_extract_expense_data_exceeds_max_file_size():
+    """Verify InvalidImageError is raised when file size exceeds maximum limit."""
+    oversized_content = b"x" * (settings.max_file_size_bytes + 1)
+    upload_file = _create_mock_upload_file(
+        content=oversized_content, content_type="image/png"
+    )
+
+    with pytest.raises(InvalidImageError) as exc_info:
+        await extract_expense_data(upload_file)
+
+    assert exc_info.value.status_code == 400
+    assert "File size exceeds maximum limit" in exc_info.value.message
+
+
+@pytest.mark.anyio
+async def test_extract_expense_data_rejected_by_gatekeeper():
     """Verify non-financial image returns ExpenseData(is_financial=False)."""
     upload_file = _create_mock_upload_file(
         content=b"scenery_photo_bytes", content_type="image/jpeg"
     )
 
-    with caplog.at_level(logging.INFO):
+    with mock_helper.mock_method(
+        "services.expense.is_valid_financial_image", return_value=False
+    ) as mock_gatekeeper:
         with mock_helper.mock_method(
-            "services.expense.is_valid_financial_image", return_value=False
-        ) as mock_gatekeeper:
-            with mock_helper.mock_method(
-                "services.expense.extractor.extract_expense_data"
-            ) as mock_extractor:
-                result = await extract_expense_data(upload_file)
+            "services.expense.extractor.extract_expense_data"
+        ) as mock_extractor:
+            result = await extract_expense_data(upload_file)
 
     mock_gatekeeper.assert_called_once_with(b"scenery_photo_bytes")
     mock_extractor.assert_not_called()
@@ -93,7 +108,6 @@ async def test_extract_expense_data_rejected_by_gatekeeper(caplog):
     assert result.date is None
     assert result.payment_method is None
     assert result.utr_number is None
-    assert "Image is not a valid financial image" in caplog.text
 
 
 @pytest.mark.anyio

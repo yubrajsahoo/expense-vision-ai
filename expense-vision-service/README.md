@@ -108,9 +108,11 @@ cp .env.example .env
 | Variable | Required | Default | Description |
 | :--- | :---: | :---: | :--- |
 | `GEMINI_API_KEY` | **Yes** | — | API key for Google Gemini multimodal processing |
+| `GEMINI_MODEL` | No | `gemini-3.8-flash` | Gemini model identifier used for extraction |
 | `HOST` | No | `0.0.0.0` | Host address to bind the Uvicorn server |
 | `PORT` | No | `8000` | Port to bind the server |
 | `RELOAD` | No | `true` | Enable/disable auto-reload during development |
+| `MAX_FILE_SIZE_MB` | No | `10` | Maximum allowed image upload size in megabytes |
 
 ---
 
@@ -239,7 +241,7 @@ uv tree
 | Method | Endpoint | Description | Status |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/actuators/health` | Service liveness / health check | Active |
-| `POST` | `/api/v1/process-image` | Validate and extract structured receipt data | Planned |
+| `POST` | `/api/v1/expense` | Validate and extract structured receipt data | Active |
 | `GET` | `/docs` | Interactive Swagger API documentation | Active |
 | `GET` | `/redoc` | ReDoc API documentation | Active |
 
@@ -277,27 +279,44 @@ expense-vision-service/
 │   ├── config/
 │   │   ├── __init__.py
 │   │   └── config.py          # Settings model (pydantic-settings)
-│   └── router/
+│   ├── exceptions/
+│   │   ├── __init__.py
+│   │   ├── custom_exceptions.py # Custom domain exceptions
+│   │   └── handlers.py        # Global exception handlers
+│   ├── router/
+│   │   ├── __init__.py
+│   │   ├── routers.py         # Router registry (Actuators & API v1)
+│   │   ├── actuators/
+│   │   │   ├── __init__.py
+│   │   │   └── health.py      # Health check endpoint
+│   │   └── v1/
+│   │       ├── __init__.py
+│   │       └── expense.py     # Expense extraction endpoint
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   └── schemas.py         # Pydantic schemas (ExpenseData)
+│   └── services/
 │       ├── __init__.py
-│       ├── routers.py         # Router registry (Actuators & API v1)
-│       └── actuators/
-│           ├── __init__.py
-│           └── health.py      # Health check endpoint
+│       ├── expense.py         # Expense orchestration service
+│       ├── extractor.py       # Gemini multimodal extraction service
+│       └── gatekeeper.py      # Local OCR gatekeeper validation
 └── tests/
     ├── __init__.py
     ├── conftest.py            # Global test fixtures (FastAPI TestClient)
-    └── unit/
-        ├── __init__.py
-        ├── test_main.py       # Application initialization & CLI tests
+    ├── helper/
+    │   ├── __init__.py
+    │   ├── mock_helper.py     # Test mocking helpers
+    │   └── resource_utils.py  # Test resource loading utilities
+    ├── integration/           # Integration tests (--integration)
+    │   ├── router/
+    │   └── services/
+    ├── resources/             # Test images and JSON fixtures
+    └── unit/                  # Fast isolated unit tests
         ├── config/
-        │   ├── __init__.py
-        │   └── test_config.py # Configuration unit tests
-        └── router/
-            ├── __init__.py
-            ├── test_routers.py # Router aggregation tests
-            └── actuators/
-                ├── __init__.py
-                └── test_health.py # Health actuator endpoint tests
+        ├── exceptions/
+        ├── router/
+        ├── schemas/
+        └── services/
 ```
 
 ---

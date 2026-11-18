@@ -15,6 +15,8 @@ def test_default_settings():
     assert test_settings.host == "0.0.0.0"
     assert test_settings.port == 8000
     assert test_settings.reload is True
+    assert test_settings.max_file_size_mb == 10
+    assert test_settings.max_file_size_bytes == 10 * 1024 * 1024
 
 
 def test_custom_settings():
@@ -25,6 +27,7 @@ def test_custom_settings():
         host="127.0.0.1",
         port=9000,
         reload=False,
+        max_file_size_mb=25,
         _env_file=None,
     )
     assert custom_settings.gemini_api_key == "custom_api_key"
@@ -32,6 +35,8 @@ def test_custom_settings():
     assert custom_settings.host == "127.0.0.1"
     assert custom_settings.port == 9000
     assert custom_settings.reload is False
+    assert custom_settings.max_file_size_mb == 25
+    assert custom_settings.max_file_size_bytes == 25 * 1024 * 1024
 
 
 def test_missing_gemini_api_key_raises_validation_error(monkeypatch):
@@ -48,6 +53,7 @@ def test_settings_loaded_from_environment(monkeypatch):
     monkeypatch.setenv("HOST", "192.168.1.100")
     monkeypatch.setenv("PORT", "8888")
     monkeypatch.setenv("RELOAD", "false")
+    monkeypatch.setenv("MAX_FILE_SIZE_MB", "15")
 
     env_settings = Settings(_env_file=None)
     assert env_settings.gemini_api_key == "env_gemini_key"
@@ -55,6 +61,8 @@ def test_settings_loaded_from_environment(monkeypatch):
     assert env_settings.host == "192.168.1.100"
     assert env_settings.port == 8888
     assert env_settings.reload is False
+    assert env_settings.max_file_size_mb == 15
+    assert env_settings.max_file_size_bytes == 15 * 1024 * 1024
 
 
 def test_global_settings_instance():
@@ -65,6 +73,8 @@ def test_global_settings_instance():
     assert isinstance(settings.host, str)
     assert isinstance(settings.port, int)
     assert isinstance(settings.reload, bool)
+    assert isinstance(settings.max_file_size_mb, int)
+    assert isinstance(settings.max_file_size_bytes, int)
 
 
 def test_configure_logging_initialization():

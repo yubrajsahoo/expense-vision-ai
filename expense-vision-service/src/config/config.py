@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     port: int = 8000
     reload: bool = True
 
+    # File Upload Limits
+    max_file_size_mb: int = 10
+
+    @property
+    def max_file_size_bytes(self) -> int:
+        """Return the maximum allowed file size in bytes."""
+        return self.max_file_size_mb * 1024 * 1024
+
     # Looks for a .env file in the root directory
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

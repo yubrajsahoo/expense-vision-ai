@@ -4,10 +4,12 @@ Handles MIME type validation, file read operations, invokes local OCR Gatekeeper
 checks, and forwards verified financial images to the Gemini extractor.
 """
 
+import asyncio
 import logging
 
-from fastapi import File, UploadFile
+from fastapi import UploadFile
 
+from config.config import settings
 from exceptions.custom_exceptions import ExtractionError, InvalidImageError
 from schemas.schemas import ExpenseData
 from services import extractor
@@ -23,16 +25,18 @@ _ALLOWED_CONTENT_TYPES = {
 }
 
 
-async def extract_expense_data(file: UploadFile = File(...)) -> ExpenseData:
+async def extract_expense_data(file: UploadFile) -> ExpenseData:
     """Validate uploaded image, run Gatekeeper OCR, and extract ExpenseData.
 
-    Validates that the file has an allowed image MIME type and non-empty content.
-    If the Gatekeeper detects no financial keywords, returns non-financial ExpenseData
-    without calling the AI model. Otherwise, calls Gemini to extract structured fields.
+    Validates that the file has an allowed image MIME type, non-empty content,
+    and does not exceed the maximum file size limit. If the Gatekeeper detects
+    no financial keywords, returns non-financial ExpenseData without calling
+    the AI model. Otherwise, calls Gemini to extract structured fields.
 
     :param file: The uploaded FastAPI UploadFile instance.
     :return: Extracted structured ExpenseData model.
-    :raises InvalidImageError: If the content type is unsupported or the file is empty.
+    :raises InvalidImageError: If the content type is unsupported, empty,
+        or exceeds max size.
     :raises ExtractionError: If extraction fails or an AI error occurs.
     """
     content_type = file.content_type
@@ -46,13 +50,21 @@ async def extract_expense_data(file: UploadFile = File(...)) -> ExpenseData:
     if not image_bytes:
         raise InvalidImageError("Uploaded file is empty.")
 
-    if not is_valid_financial_image(image_bytes):
+    if len(image_bytes) > settings.max_file_size_bytes:
+        raise InvalidImageError(
+            f"File size exceeds maximum limit of {settings.max_file_size_mb} MB."
+        )
+
+    is_financial = await asyncio.to_thread(is_valid_financial_image, image_bytes)
+    if not is_financial:
         return ExpenseData(
             is_financial=False,
         )
 
     try:
-        return extractor.extract_expense_data(image_bytes, str(content_type))
+        return await asyncio.to_thread(
+            extractor.extract_expense_data, image_bytes, str(content_type)
+        )
 
     except ExtractionError as e:
         raise e

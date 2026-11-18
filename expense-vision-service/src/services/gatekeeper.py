@@ -48,7 +48,7 @@ def is_valid_financial_image(image_bytes: bytes) -> bool:
             .lower()
         )
 
-        _logger.debug(f"Extracted text from image is: {extracted_text}")
+        _logger.debug("Extracted text from image is: %s", extracted_text)
 
         is_valid = bool(_FINANCIAL_PATTERN.search(extracted_text))
 
@@ -58,5 +58,5 @@ def is_valid_financial_image(image_bytes: bytes) -> bool:
         return is_valid
 
     except Exception as e:
-        _logger.error(f"Error validating financial image: {e}")
+        _logger.error("Error validating financial image: %s", e)
         return False
