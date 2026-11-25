@@ -5,7 +5,7 @@ Use these standardized Markdown templates when generating analysis drafts, plans
 ---
 
 ## 1. Analysis & Planning Template
-Save to: `.ai/reports/md/YYYY-MM-DD_<topic>_{analysis,plan}.md` and `.ai/memory/YYYY-MM-DD_{analysis,plan}_<topic>.md`
+Save to: `.ai/memory/YYYY-MM-DD_{analysis,plan}_<topic>.md` (compiled to HTML via `python .ai/report_tool.py [file] --open`)
 
 ```markdown
 # [Analysis / Plan]: [Topic Name]
@@ -65,8 +65,51 @@ Save to: `.ai/reports/md/YYYY-MM-DD_<topic>_{analysis,plan}.md` and `.ai/memory/
 
 ---
 
-## 2. Test Run Report Template
-Save to: `.ai/reports/md/YYYY-MM-DD_<topic>_test-run.md` and `.ai/memory/YYYY-MM-DD_debug_<topic>.md`
+## 2. Implementation Report Template
+Save to: `.ai/memory/YYYY-MM-DD_implementation_<topic>.md` (compiled to HTML via `python .ai/report_tool.py [file] --open`)
+
+```markdown
+# Implementation Report: [Topic Name]
+
+- **Date:** YYYY-MM-DD
+- **Agent:** Gemini 4 Hydrogen (Implementation) & Gemini 3.8 (Test Authoring)
+- **Scope:** [Module or Feature Affected]
+- **Status:** COMPLETED
+
+---
+
+## 1. Summary of Changes
+[Brief 2-3 sentence overview of files modified, logic implemented, and tests authored.]
+
+---
+
+## 2. Modified & Created Files
+
+| File | Status | Description |
+| :--- | :--- | :--- |
+| `path/to/file` | New / Modified | [Summary of code added] |
+
+---
+
+## 3. Authored Tests
+
+| Test Class / Function | Test Type | Coverage Focus |
+| :--- | :--- | :--- |
+| `path/to/test` | Unit / Slice | [Target functionality tested] |
+
+---
+
+## 4. Architectural & Convention Checks
+- [ ] Conforms to Java 25 / Python 3.12+ conventions
+- [ ] No secrets committed; configurations abstracted into environment properties
+- [ ] Tests authored in-memory without external network dependencies
+- [ ] Ready for Quality Guardian verification
+```
+
+---
+
+## 3. Test Run Report Template
+Save to: `.ai/memory/YYYY-MM-DD_debug_<topic>.md` (compiled to HTML via `python .ai/report_tool.py [file] --open`)
 
 ```markdown
 # Test Run Report: [Topic Name]
@@ -112,8 +155,8 @@ Save to: `.ai/reports/md/YYYY-MM-DD_<topic>_test-run.md` and `.ai/memory/YYYY-MM
 
 ---
 
-## 3. Code Review Template
-Save to: `.ai/memory/YYYY-MM-DD_review_<topic>.md`
+## 4. Code Review Template
+Save to: `.ai/memory/YYYY-MM-DD_review_<topic>.md` (compiled to HTML via `python .ai/report_tool.py [file] --open`)
 
 ```markdown
 # Code Review: [Topic Name]

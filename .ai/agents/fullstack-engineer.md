@@ -29,14 +29,19 @@
 
 ---
 
-## 3. Mandatory Review Gate
-🛑 **Implementation Review Gate:**
-- Present the diff summary and authored tests to the user in chat.
-- Await user review and confirmation before handing off to the Quality Guardian for test execution.
+## 3. Automatic Report Generation
+Immediately upon completing implementation and test authoring:
+- **Memory Update:** Record change log to `.ai/memory/YYYY-MM-DD_implementation_<topic>.md` and update `INDEX.md`.
+- **HTML Report & Auto-Open in IntelliJ:**
+  `python .ai/report_tool.py .ai/memory/YYYY-MM-DD_implementation_<topic>.md --open`
+- **HTML Only:** Outputs `.ai/reports/YYYY-MM-DD_implementation_<topic>.html` directly (no `.md` files or subfolders under `.ai/reports/`).
 
 ---
 
-## 4. Deliverables Upon Confirmation
-- Record change log in `.ai/memory/YYYY-MM-DD_implementation_<topic>.md`.
-- Append entry to `.ai/memory/INDEX.md`.
+## 4. Mandatory Review Gate
+🛑 **Implementation Review Gate:**
+- Automatically opens the implementation HTML report in IntelliJ IDEA for the user.
+- **In chat, do NOT dump full code or large diffs.**
+- Present a concise 2-3 sentence summary of modified files and new tests with clickable link to the HTML report.
+- Await user review and confirmation before handing off to Agent 3 (Quality Guardian) for test execution.
 - **Update `.ai/PROJECT_CONTEXT.md`** if the change introduces new dependencies, modules, packages, database changes, or convention shifts.

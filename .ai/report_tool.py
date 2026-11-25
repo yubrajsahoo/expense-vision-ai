@@ -2,13 +2,13 @@
 """
 Multi-Agent Report & Memory Tool
 Consolidated zero-dependency utility for:
-1. Compiling Markdown reports (.ai/reports/md/) into styled HTML (.ai/reports/html/).
+1. Compiling memory logs (.ai/memory/) directly into styled HTML reports (.ai/reports/).
 2. Logging stage outputs to .ai/memory/ and registering in INDEX.md.
 3. Verifying the multi-agent architecture setup.
 
 Usage:
-    # Compile single report or all reports
-    python .ai/report_tool.py [path_to_report.md]
+    # Compile memory log into HTML report (and optionally open in IntelliJ)
+    python .ai/report_tool.py [path_to_memory_file.md] [--open]
 
     # Log memory artifact
     python .ai/report_tool.py --log --stage analysis --agent "Antigravity Gemini 3.8" --topic jwt-auth --summary "Analyzed JWT validation"
@@ -75,7 +75,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     }}
     .badge-analysis {{ background: rgba(56, 189, 248, 0.2); color: var(--accent); border: 1px solid var(--accent); }}
     .badge-plan {{ background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #c084fc; }}
+    .badge-implementation {{ background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }}
     .badge-test-run {{ background: rgba(34, 197, 94, 0.2); color: var(--success); border: 1px solid var(--success); }}
+    .badge-review {{ background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid #818cf8; }}
+    .badge-debug {{ background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }}
     .badge-failure {{ background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }}
     h1 {{ font-size: 2rem; margin-bottom: 0.5rem; color: #fff; }}
     .meta {{ color: var(--text-muted); font-size: 0.9rem; }}
@@ -263,7 +266,7 @@ def inline_format(text: str) -> str:
     text = re.sub(r"\*([^\*]+)\*", r"<em>\1</em>", text)
     return text
 
-def convert_file(md_path: Path, html_path: Path = None):
+def convert_file(md_path: Path, html_path: Path = None, open_ide: bool = False):
     md_content = md_path.read_text(encoding="utf-8")
     stem = md_path.stem
     lower = stem.lower()
@@ -274,9 +277,18 @@ def convert_file(md_path: Path, html_path: Path = None):
     elif "analysis" in lower:
         report_type = "Analysis"
         badge_class = "badge-analysis"
-    elif "test-run" in lower:
+    elif "implementation" in lower:
+        report_type = "Implementation"
+        badge_class = "badge-implementation"
+    elif "test-run" in lower or "testing" in lower:
         report_type = "Test Run"
         badge_class = "badge-test-run"
+    elif "review" in lower:
+        report_type = "Code Review"
+        badge_class = "badge-review"
+    elif "debug" in lower:
+        report_type = "Diagnostics"
+        badge_class = "badge-debug"
     else:
         report_type = "Report"
         badge_class = "badge-analysis"
@@ -296,11 +308,26 @@ def convert_file(md_path: Path, html_path: Path = None):
     )
 
     if html_path is None:
-        html_path = md_path.parent.parent / "html" / f"{stem}.html"
+        root_dir = Path(__file__).resolve().parent.parent
+        reports_dir = root_dir / ".ai" / "reports"
+        html_path = reports_dir / f"{stem}.html"
 
     html_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.write_text(full_html, encoding="utf-8")
     print(f"Generated HTML report: {html_path}")
+
+    if open_ide:
+        open_in_intellij(html_path)
+
+    return html_path
+
+def open_in_intellij(path: Path):
+    try:
+        cmd = ["idea.cmd", str(path.resolve())] if sys.platform == "win32" else ["idea", str(path.resolve())]
+        subprocess.Popen(cmd, shell=(sys.platform == "win32"))
+        print(f"Opened in IntelliJ: {path}")
+    except Exception as e:
+        print(f"Could not open in IntelliJ: {e}")
 
 def log_memory(stage: str, agent: str, topic: str, summary: str):
     stage = stage.lower()
@@ -377,6 +404,8 @@ if __name__ == "__main__":
     parser.add_argument("--agent", help="Agent name/model for memory logging")
     parser.add_argument("--topic", help="Topic for memory logging")
     parser.add_argument("--summary", help="Summary for memory logging")
+    parser.add_argument("--open", dest="open_ide", action="store_true", default=True, help="Open the compiled HTML report in IntelliJ IDEA (default: True)")
+    parser.add_argument("--no-open", dest="open_ide", action="store_false", help="Do not open the report in IntelliJ")
     parser.add_argument("--verify", action="store_true", help="Verify AI setup files and gitignore")
 
     args = parser.parse_args()
@@ -391,18 +420,20 @@ if __name__ == "__main__":
     elif args.report:
         p = Path(args.report)
         if p.is_file():
-            convert_file(p)
+            convert_file(p, open_ide=args.open_ide)
         elif p.is_dir():
             for f in p.glob("*.md"):
-                convert_file(f)
+                convert_file(f, open_ide=args.open_ide)
         else:
             print(f"File not found: {args.report}", file=sys.stderr)
             sys.exit(1)
     else:
-        # Default: compile all reports in .ai/reports/md
-        md_dir = Path(".ai/reports/md")
-        if md_dir.exists():
-            for f in md_dir.glob("*.md"):
-                convert_file(f)
+        # Default: compile all memory files into .ai/reports/
+        root_dir = Path(__file__).resolve().parent.parent
+        mem_dir = root_dir / ".ai" / "memory"
+        if mem_dir.exists():
+            for f in mem_dir.glob("*.md"):
+                if f.name != "INDEX.md":
+                    convert_file(f, open_ide=args.open_ide)
         else:
-            print("Usage: python .ai/report_tool.py [path_to_report.md] | --log | --verify")
+            print("Usage: python .ai/report_tool.py [path_to_memory_file.md] [--open] | --log | --verify")

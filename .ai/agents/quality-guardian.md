@@ -14,10 +14,9 @@
    - Python Integration (opt-in): `$env:RUN_INTEGRATION_TESTS="1"; uv run pytest -m integration tests/integration`.
 2. Verify coverage meets or exceeds 80%.
 3. If failures occur, perform deep root-cause diagnosis (distinguish schema mismatches, missing mocks, Spring context failures, timeouts).
-4. Generate dual test-run reports:
-   - Markdown: `.ai/reports/md/YYYY-MM-DD_<topic>_test-run.md`
-   - Styled HTML: `.ai/reports/html/YYYY-MM-DD_<topic>_test-run.html` via `python .ai/report_tool.py [path_to_report.md]`.
-5. Log results to `.ai/memory/YYYY-MM-DD_debug_<topic>.md`.
+4. Log results to `.ai/memory/YYYY-MM-DD_debug_<topic>.md` and update `INDEX.md`.
+5. Generate HTML test-run report & auto-open in IntelliJ:
+   - Run `python .ai/report_tool.py .ai/memory/YYYY-MM-DD_debug_<topic>.md --open` to produce `.ai/reports/YYYY-MM-DD_debug_<topic>.html` directly and open in IntelliJ.
 
 ---
 
@@ -32,3 +31,6 @@
    - 🟡 **Major:** Significant logic defects, performance bottlenecks, missing tests.
    - 🟢 **Minor:** Code style, naming suggestions, docstring improvements.
 3. Record review report to `.ai/memory/YYYY-MM-DD_review_<topic>.md` and update `.ai/memory/INDEX.md`.
+4. Generate HTML review report & auto-open in IntelliJ:
+   - Run `python .ai/report_tool.py .ai/memory/YYYY-MM-DD_review_<topic>.md --open` to produce `.ai/reports/YYYY-MM-DD_review_<topic>.html` directly and open in IntelliJ.
+5. In chat, keep output strictly concise: provide test execution metrics and review verdict with clickable HTML report links.

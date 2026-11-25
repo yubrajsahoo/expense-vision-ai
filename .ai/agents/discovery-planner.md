@@ -9,8 +9,8 @@
 
 ## 1. Analysis Workflow (`OpenCode` - Free)
 1. Read `.ai/memory/INDEX.md` first to leverage past architectural decisions and stage logs.
-2. Verify target file paths and existence across `expense-core-api` (Java) and `expense-vision-service` (Python).
-3. **No deep code rescan:** Because context is stored in memory, do NOT scan entire source trees.
+2. Read **only** explicitly required files for the current task. Do **NOT** read all files or scan source directories indiscriminately.
+3. Take all other architectural details, module boundaries, and conventions from `.ai/memory/` and `.ai/PROJECT_CONTEXT.md`.
 4. Assess cross-service schema impacts (e.g. Java DTOs matching Python Pydantic models).
 
 ---
@@ -22,15 +22,18 @@
 
 ---
 
-## 3. Mandatory Review Gate
-🛑 **Interactive Confirmation Gate:**
-- Present the draft analysis and plan in chat before writing any report files.
-- Pause for user questions, additions, and explicit approval.
+## 3. Automatic Report & Memory Generation
+Immediately upon drafting the plan/analysis:
+- **Memory Update:** Log to `.ai/memory/YYYY-MM-DD_{analysis,plan}_<topic>.md` and append a row to `.ai/memory/INDEX.md`.
+- **HTML Report & Auto-Open in IntelliJ:**
+  `python .ai/report_tool.py .ai/memory/YYYY-MM-DD_{analysis,plan}_<topic>.md --open`
+- **HTML Only:** Generates `.ai/reports/YYYY-MM-DD_<topic>_{analysis,plan}.html` directly (no `.md` files or subfolders under `.ai/reports/`).
 
 ---
 
-## 4. Deliverables Upon Approval
-- **Markdown Report:** `.ai/reports/md/YYYY-MM-DD_<topic>_{analysis,plan}.md`
-- **Styled HTML Report:** `.ai/reports/html/YYYY-MM-DD_<topic>_{analysis,plan}.html`
-- **Compiler Command:** `python .ai/report_tool.py [path_to_report.md]`
-- **Memory Update:** Log to `.ai/memory/YYYY-MM-DD_{analysis,plan}_<topic>.md` and append a row to `.ai/memory/INDEX.md`.
+## 4. Mandatory Review Gate
+🛑 **Interactive Confirmation Gate:**
+- Automatically opens the HTML plan in IntelliJ IDEA for the user.
+- **In chat, do NOT specify code dumps or lengthy plans.**
+- Output ONLY a brief 2-3 sentence summary with clickable link to the HTML report.
+- Pause for user confirmation before passing the task to Agent 2 (Full-Stack Engineer).

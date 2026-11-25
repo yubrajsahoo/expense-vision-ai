@@ -38,9 +38,8 @@ expense-vision-ai/
 │   ├── memory/                         # Local execution memory (flat directory, git-ignored)
 │   │   ├── INDEX.md                    # Chronological index of memory logs
 │   │   └── YYYY-MM-DD_<stage>_<topic>.md # Memory logs stored directly in folder
-│   ├── reports/                        # Analysis & test-run dual reports (git-ignored)
-│   │   ├── md/                         # Markdown reports
-│   │   └── html/                       # Interactive HTML reports
+│   ├── reports/                        # Interactive styled HTML reports (flat directory, git-ignored)
+│   │   └── YYYY-MM-DD_<topic>_<stage>.html # HTML reports compiled directly from memory
 │   ├── PROJECT_CONTEXT.md              # Polyglot architecture, module map & engineering standards
 │   ├── TEMPLATES.md                    # Structured templates for reports, reviews & memory logs
 │   └── report_tool.py                  # HTML report compiler, memory logger & self-verification
